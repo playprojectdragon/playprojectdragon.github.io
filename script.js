@@ -24,6 +24,44 @@ var METRICAS_VERCEL = false;
 (function () {
   'use strict';
 
+  // ---------- Idioma (20/10/2026: "ingles pra todos com opção de ptbr", "mas default english") ----------
+  // Inglês por padrão; ?lang=pt|en no endereço vence a escolha guardada. O português mora no próprio HTML:
+  // data-pt (conteúdo), data-pt-aria (aria-label) e data-pt-cap (legenda da foto ampliada).
+  var CHAVE_IDIOMA = 'pd:idioma';
+  var idioma = 'en';
+  try { idioma = localStorage.getItem(CHAVE_IDIOMA) === 'pt' ? 'pt' : 'en'; } catch (e) { /* sem armazenamento */ }
+  var pedido = new URLSearchParams(location.search).get('lang');
+  if (pedido === 'pt' || pedido === 'en') idioma = pedido;
+  function t(en, pt) { return idioma === 'pt' ? pt : en; }
+
+  // Guarda o inglês original na primeira troca e escreve a língua pedida.
+  function trocar(seletor, atributoPt, atributoEn, ler, escrever) {
+    document.querySelectorAll(seletor).forEach(function (el) {
+      if (!el.hasAttribute(atributoEn)) el.setAttribute(atributoEn, ler(el));
+      escrever(el, el.getAttribute(idioma === 'pt' ? atributoPt : atributoEn));
+    });
+  }
+  function aplicarIdioma(novo) {
+    idioma = novo;
+    document.documentElement.lang = novo === 'pt' ? 'pt-BR' : 'en';
+    document.title = t('Project Dragon — Closed Alpha', 'Project Dragon — Alfa Fechado');
+    trocar('[data-pt]', 'data-pt', 'data-en', function (el) { return el.innerHTML; }, function (el, v) { el.innerHTML = v; });
+    trocar('[data-pt-aria]', 'data-pt-aria', 'data-en-aria', function (el) { return el.getAttribute('aria-label') || ''; }, function (el, v) { el.setAttribute('aria-label', v); });
+    trocar('[data-pt-cap]', 'data-pt-cap', 'data-en-cap', function (el) { return el.getAttribute('data-caption') || ''; }, function (el, v) { el.setAttribute('data-caption', v); });
+    document.querySelectorAll('.lang-btn').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-lang') === novo)); });
+  }
+  document.querySelectorAll('.lang-btn').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var novo = b.getAttribute('data-lang');
+      if (novo === idioma) return;
+      try { localStorage.setItem(CHAVE_IDIOMA, novo); } catch (e) { /* sem armazenamento */ }
+      var u = new URL(location.href);
+      if (u.searchParams.has('lang')) { u.searchParams.set('lang', novo); history.replaceState(null, '', u.toString()); }
+      aplicarIdioma(novo);
+    });
+  });
+  if (idioma !== 'en') aplicarIdioma(idioma);
+
   // ---------- Métricas ----------
   if (METRICAS_VERCEL && location.protocol === 'https:') {
     window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
@@ -63,7 +101,7 @@ var METRICAS_VERCEL = false;
   // A ordem de navegação segue a filmstrip; as miniaturas das notícias abrem a mesma foto.
   var strip = Array.prototype.slice.call(document.querySelectorAll('.filmstrip [data-lightbox]'));
   var fotos = strip.map(function (a) {
-    return { id: a.getAttribute('data-lightbox'), src: a.getAttribute('href'), cap: a.getAttribute('data-caption') || '', alt: a.querySelector('img').alt };
+    return { id: a.getAttribute('data-lightbox'), src: a.getAttribute('href'), alt: a.querySelector('img').alt };
   });
   var atual = 0;
   var voltarFoco = null;
@@ -73,7 +111,8 @@ var METRICAS_VERCEL = false;
     var f = fotos[atual];
     img.src = f.src;
     img.alt = f.alt;
-    cap.textContent = f.cap;
+    // A legenda é lida na hora: muda junto com o idioma.
+    cap.textContent = strip[atual].getAttribute('data-caption') || '';
   }
 
   function abrir(id, origem) {
@@ -176,7 +215,7 @@ var METRICAS_VERCEL = false;
         feito.hidden = false;
       })
       .catch(function () {
-        erro.textContent = 'Your request could not be sent. Please try again later.';
+        erro.textContent = t('Your request could not be sent. Please try again later.', 'Não foi possível enviar o seu pedido. Tente de novo mais tarde.');
         erro.hidden = false;
       })
       .then(function () { enviando = false; botao.disabled = false; });
@@ -197,9 +236,9 @@ var METRICAS_VERCEL = false;
   }
 
   function mensagem(c) {
-    if (c.name === 'email') return 'Please enter a valid e-mail address.';
-    if (c.name === 'account') return 'Account name: 3 to 16 letters or numbers.';
-    if (c.name === 'why') return 'Please tell us why you want in.';
-    return 'Please confirm that you understand this is an alpha.';
+    if (c.name === 'email') return t('Please enter a valid e-mail address.', 'Digite um e-mail válido.');
+    if (c.name === 'account') return t('Account name: 3 to 16 letters or numbers.', 'Nome da conta: de 3 a 16 letras ou números.');
+    if (c.name === 'why') return t('Please tell us why you want in.', 'Conte por que você quer entrar.');
+    return t('Please confirm that you understand this is an alpha.', 'Confirme que você entende que é um alfa.');
   }
 })();
