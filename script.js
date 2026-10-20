@@ -10,7 +10,11 @@ var VIDEO_YOUTUBE = 'dNGbQo7ODF0';   // 20/10: o trailer, não listado
 //    Google Forms → destino = 'https://docs.google.com/forms/d/e/<código>/formResponse' e, em campos,
 //      o "entry.N" de cada pergunta: { email: 'entry.1', account: 'entry.2', why: 'entry.3', ack: 'entry.4' }.
 //    Outro serviço (ex.: Formspree) → só o destino; os campos vão com os nomes do formulário.
-var PEDIDOS = { destino: '', campos: {} };
+// 20/10: o Google Form "Project Dragon — Access Requests", na conta Google dele.
+var PEDIDOS = {
+  destino: 'https://docs.google.com/forms/d/e/1FAIpQLSeLF9sMJI7dXDRtoUT1sXMiBFJZqnzOt8G7lqzbppJyP9mwEA/formResponse',
+  campos: { email: 'entry.1444206360', account: 'entry.378624587', why: 'entry.2121006602', ack: 'entry.151127294' }
+};
 
 // 3. Métricas de página: Vercel Web Analytics (visitas, origem, país). Só carrega no site publicado
 //    (https); aberto por dois cliques ou em servidor local, nada é carregado.
