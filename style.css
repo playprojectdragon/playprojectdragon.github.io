@@ -560,7 +560,7 @@ h1, h2, h3 { font-family: var(--serif-title); font-weight: 700; margin: 0; }
 }
 .alpha-note strong { color: #ffb08a; font-weight: 600; }
 
-/* ---------- Lateral: status, login, pedido ---------- */
+/* ---------- Lateral: status, pedido ---------- */
 
 .realm {
   display: flex;
@@ -657,9 +657,6 @@ textarea { resize: vertical; min-height: 96px; }
 input:focus, textarea:focus { outline: none; box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.9), 0 0 0 1px var(--gold), 0 0 10px rgba(217, 180, 90, 0.35); }
 input[disabled] { opacity: 0.45; cursor: not-allowed; }
 input[aria-invalid="true"], textarea[aria-invalid="true"] { box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.9), 0 0 0 1px #c0442a; }
-
-.login .btn { margin-top: 16px; }
-.login-closed { margin: 12px 0 0; font-size: 14px; font-style: italic; color: var(--ink-mute); }
 
 .warn {
   margin: 0 0 16px;
