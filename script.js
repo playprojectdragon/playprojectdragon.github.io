@@ -107,6 +107,7 @@ var METRICAS_VERCEL = false;
   var voltarFoco = null;
 
   function mostrar(i) {
+    if (atual < 0) return;
     atual = (i + fotos.length) % fotos.length;
     var f = fotos[atual];
     img.src = f.src;
@@ -116,10 +117,21 @@ var METRICAS_VERCEL = false;
   }
 
   function abrir(id, origem) {
-    var i = 0;
+    var i = -1;
     for (var k = 0; k < fotos.length; k++) { if (fotos[k].id === id) { i = k; break; } }
     voltarFoco = origem || null;
-    mostrar(i);
+    atual = i;
+    btnPrev.hidden = btnNext.hidden = i < 0;
+    if (i < 0) {
+      // Notícias fora da galeria abrem a própria foto, sem entrar na sequência.
+      img.src = origem.getAttribute('href');
+      img.alt = origem.querySelector('img').alt;
+      var noticia = origem.closest('.news-item');
+      var titulo = noticia && noticia.querySelector('.news-title');
+      cap.textContent = origem.getAttribute('data-caption') || (titulo ? titulo.textContent : img.alt);
+    } else {
+      mostrar(i);
+    }
     box.hidden = false;
     document.body.style.overflow = 'hidden';
     btnClose.focus();
