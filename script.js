@@ -72,13 +72,18 @@ var METRICAS_VERCEL = false;
   }
 
   // ---------- Vídeo (capa clicável; o YouTube só carrega depois do clique) ----------
+  // 20/10: o HTML já nasce com o trailer (link pro YouTube), para quem lê a página sem rodar script (buscadores, IAs,
+  // prévias de link) não ver "coming soon"; com script, o clique abre o vídeo aqui mesmo.
   var quadro = document.getElementById('video-frame');
   var play = document.getElementById('video-play');
   var embreve = document.getElementById('video-soon');
-  if (VIDEO_YOUTUBE) {
-    embreve.hidden = true;
-    play.hidden = false;
-    play.addEventListener('click', function () {
+  if (!VIDEO_YOUTUBE) {
+    play.hidden = true;
+    embreve.hidden = false;
+  } else {
+    play.href = 'https://youtu.be/' + encodeURIComponent(VIDEO_YOUTUBE);
+    play.addEventListener('click', function (e) {
+      e.preventDefault();
       var f = document.createElement('iframe');
       f.src = 'https://www.youtube-nocookie.com/embed/' + encodeURIComponent(VIDEO_YOUTUBE) + '?autoplay=1&rel=0';
       f.title = 'Project Dragon — gameplay';
