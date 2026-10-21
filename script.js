@@ -1,11 +1,12 @@
-// Project Dragon — o mínimo de JS: vídeo, galeria (lightbox), formulário de pedido de acesso e métricas.
+// Project Dragon — o mínimo de JS: vídeo, galeria (lightbox), link de jogar e métricas.
 
-// ===== OS TRÊS PONTOS DE CONFIGURAÇÃO =====
+// ===== OS QUATRO PONTOS DE CONFIGURAÇÃO =====
 // 1. Vídeo: o código do vídeo no YouTube (o que vem depois de "watch?v=" ou de "youtu.be/").
 //    Vazio → a página mostra a capa com "Gameplay video coming soon".
 var VIDEO_YOUTUBE = 'dNGbQo7ODF0';   // 20/10: o trailer, não listado
 
-// 2. Pedidos de acesso. Ver PUBLICAR.md.
+// 2. Pedidos de acesso. Ver PUBLICAR.md. 20/10/2026, 23:5x: o servidor abriu pra criar conta e o formulário saiu da
+//    página; este código fica sem uso, pronto se uma leva fechada voltar.
 //    destino vazio → nada é enviado; quem preenche vê "Requests are not open yet." (aviso honesto).
 //    Google Forms → destino = 'https://docs.google.com/forms/d/e/<código>/formResponse' e, em campos,
 //      o "entry.N" de cada pergunta: { email: 'entry.1', account: 'entry.2', why: 'entry.3', ack: 'entry.4' }.
@@ -20,6 +21,9 @@ var PEDIDOS = {
 //    (https); aberto por dois cliques ou em servidor local, nada é carregado.
 //    20/10: a página foi pro GitHub Pages (playprojectdragon.github.io), onde isso não existe; fica desligado.
 var METRICAS_VERCEL = false;
+
+// 4. O jogo (20/10/2026, servidor aberto): todo link com data-jogar vai pra cá, com a língua da página no fim.
+var JOGO = 'https://projectdragon.duckdns.org/?servidor=aqui';
 
 (function () {
   'use strict';
@@ -44,7 +48,8 @@ var METRICAS_VERCEL = false;
   function aplicarIdioma(novo) {
     idioma = novo;
     document.documentElement.lang = novo === 'pt' ? 'pt-BR' : 'en';
-    document.title = t('Project Dragon — Closed Alpha', 'Project Dragon — Alfa Fechado');
+    document.title = t('Project Dragon — Open Alpha', 'Project Dragon — Alfa Aberto');
+    document.querySelectorAll('[data-jogar]').forEach(function (a) { a.href = JOGO + '&lang=' + novo; });
     trocar('[data-pt]', 'data-pt', 'data-en', function (el) { return el.innerHTML; }, function (el, v) { el.innerHTML = v; });
     trocar('[data-pt-aria]', 'data-pt-aria', 'data-en-aria', function (el) { return el.getAttribute('aria-label') || ''; }, function (el, v) { el.setAttribute('aria-label', v); });
     trocar('[data-pt-cap]', 'data-pt-cap', 'data-en-cap', function (el) { return el.getAttribute('data-caption') || ''; }, function (el, v) { el.setAttribute('data-caption', v); });
@@ -188,6 +193,7 @@ var METRICAS_VERCEL = false;
 
   // ---------- Pedido de acesso ----------
   var form = document.getElementById('signup');
+  if (!form) return; // sem formulário na página (servidor aberto)
   var erro = document.getElementById('su-error');
   var feito = document.getElementById('su-done');
   var fechado = document.getElementById('su-closed');
